@@ -10,6 +10,8 @@ body {
 a { color: #2f6feb; }
 
 .header {
+  display: flex;
+  justify-content: space-between;
   padding: 16px 24px;
   background: #fff;
   border-bottom: 1px solid #e3e5e8;

@@ -36,6 +36,7 @@ export default function StatusView({ status, couponCode, orderId, onRetry }) {
             Написать в поддержку
           </a>
         </div>
+        <p>Статус заказа можно проверить позже в разделе <Link to="/orders">«Мои покупки»</Link>.</p>
       </div>
     )
   }

@@ -12,6 +12,12 @@ export const COUPONS = [
 
 const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
+export async function getOrders() {
+  await delay(STATUS_DELAY)
+  const orders = readOrders()
+  return Object.values(orders).map(applyWebhookIfDue).sort((a, b) => b.createdAt - a.createdAt)
+}
+
 function readOrders() {
   try {
     return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {}

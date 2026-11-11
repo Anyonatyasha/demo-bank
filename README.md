@@ -28,7 +28,8 @@ npm run dev
    - `loading`: «Платёж обрабатывается»;
    - `success`: «Оплата прошла» и код купона;
    - `failed`: ошибка и «Попробовать снова»;
-   - `timeout`: «Не удалось подтвердить платёж», кнопки «Проверить снова» и «Написать в поддержку».
+   - `timeout`: «Не удалось подтвердить платёж», кнопки «Проверить снова» и «Написать в поддержку», ссылка на «Мои покупки».
+4. **`/orders`: «Мои покупки».** Список всех заказов, новые сверху, загружается через `getOrders()`. У оплаченных показан код купона, у заказов в обработке есть ссылка «Проверить статус», которая ведёт на экран результата. Так купон можно найти, даже если пользователь ушёл со страницы результата или получил таймаут.
 
 ## Ключевые решения
 
@@ -42,9 +43,9 @@ npm run dev
 
 ```
 src/
-  api/paymentApi.js           моки: createPayment, getOrderStatus, confirmByBank
+  api/paymentApi.js           моки: createPayment, getOrderStatus, getOrders, confirmByBank
   hooks/usePaymentStatus.js   опрос статуса с лимитом попыток
-  pages/                      CatalogPage, BankPage, PaymentResultPage, PaymentFailPage
+  pages/                      CatalogPage, BankPage, PaymentResultPage, PaymentFailPage, OrdersPage
   components/                 CouponCard, StatusView
   App.jsx                     маршруты (+ страница 404)
 ```
