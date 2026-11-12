@@ -1,6 +1,14 @@
 import { Link } from 'react-router-dom'
+import type { Order, PaymentStatus } from '../types'
 
-export default function StatusView({ status, couponCode, orderId, onRetry }) {
+interface StatusViewProps {
+  status: PaymentStatus
+  couponCode?: Order['couponCode']
+  orderId?: Order['orderId'] | null
+  onRetry?: () => void
+}
+
+export default function StatusView({ status, couponCode, orderId, onRetry }: StatusViewProps) {
   if (status === 'loading') {
     return (
       <div className="status">
