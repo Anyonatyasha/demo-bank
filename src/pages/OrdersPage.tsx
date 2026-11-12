@@ -1,15 +1,16 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getOrders } from '../api/paymentApi'
+import type { Order, OrderStatus } from '../types'
 
-const STATUS_LABELS = {
+const STATUS_LABELS: Record<OrderStatus, string> = {
   pending: 'В обработке',
   success: 'Оплачен',
   failed: 'Не оплачен',
 }
 
 export default function OrdersPage() {
-  const [orders, setOrders] = useState(undefined)
+  const [orders, setOrders] = useState<Order[]>()
 
   useEffect(() => {
     let cancelled = false
