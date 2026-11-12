@@ -2,14 +2,15 @@ import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { COUPONS, createPayment } from '../api/paymentApi'
 import CouponCard from '../components/CouponCard'
+import type { Coupon } from '../types'
 
 export default function CatalogPage() {
   const navigate = useNavigate()
-  const [pendingId, setPendingId] = useState(null)
-  const [error, setError] = useState(null)
+  const [pendingId, setPendingId] = useState<Coupon['id'] | null>(null)
+  const [error, setError] = useState<string | null>(null)
   const inFlight = useRef(false)
 
-  async function handlePay(couponId) {
+  async function handlePay(couponId: Coupon['id']) {
     if (inFlight.current) return
     inFlight.current = true
     setPendingId(couponId)
@@ -19,7 +20,11 @@ export default function CatalogPage() {
       const { paymentUrl } = await createPayment(couponId)
       navigate(paymentUrl)
     } catch (e) {
-      setError(e.message)
+      if (e instanceof Error) {
+        setError(e.message)
+      } else {
+        setError('Неизвестная ошибка')
+      }
       setPendingId(null)
       inFlight.current = false
     }
