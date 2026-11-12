@@ -1,20 +1,26 @@
 import { useCallback, useEffect, useState } from 'react'
 import { getOrderStatus } from '../api/paymentApi'
+import type { PaymentStatus } from '../types'
 
 const POLL_INTERVAL = 2000
 const MAX_ATTEMPTS = 10
 
+interface PaymentState {
+  status: PaymentStatus
+  couponCode: string | null
+}
 /**
  * Опрашивает статус заказа каждые 2 секунды, максимум 10 попыток.
  * status: loading | success | failed | timeout
  */
-export function usePaymentStatus(orderId) {
-  const [state, setState] = useState({ status: 'loading', couponCode: null })
+
+export function usePaymentStatus(orderId: string | null) {
+  const [state, setState] = useState<PaymentState>({ status: 'loading', couponCode: null })
   const [runId, setRunId] = useState(0)
 
   useEffect(() => {
     let cancelled = false
-    let timer = null
+    let timer: ReturnType<typeof setTimeout> | undefined
     let attempts = 0
 
     async function check() {
