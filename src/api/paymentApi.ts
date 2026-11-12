@@ -1,16 +1,18 @@
+import type { Coupon, Order, Webhook } from '../types'
+
 const STORAGE_KEY = 'demo-bank:orders'
 const CREATE_DELAY = 800 // задержка ответа на создание платежа
 const STATUS_DELAY = 300 // задержка ответа на запрос статуса
 const WEBHOOK_DELAY = 3000 // через сколько присылает вебхук
 
-export const COUPONS = [
+export const COUPONS: Coupon[] = [
   { id: 'coffee', title: 'Кофейня', amount: 500 },
   { id: 'cinema', title: 'Кинотеатр', amount: 1000 },
   { id: 'books', title: 'Книжный', amount: 2500 },
   { id: 'spa', title: 'СПА', amount: 5000 },
 ]
 
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export async function getOrders() {
   await delay(STATUS_DELAY)
@@ -18,26 +20,26 @@ export async function getOrders() {
   return Object.values(orders).map(applyWebhookIfDue).sort((a, b) => b.createdAt - a.createdAt)
 }
 
-function readOrders() {
+function readOrders(): Record<string, Order> {
   try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY)) ?? {}
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? '{}') 
   } catch {
     return {}
   }
 }
 
-function saveOrder(order) {
+function saveOrder(order: Order) {
   const orders = readOrders()
   orders[order.orderId] = order
   localStorage.setItem(STORAGE_KEY, JSON.stringify(orders))
 }
 
-function generateId(prefix) {
+function generateId(prefix: string) {
   return `${prefix}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 8)}`.toUpperCase()
 }
 
 /** Создаёт заказ со статусом pending и возвращает ссылку на оплату. */
-export async function createPayment(couponId) {
+export async function createPayment(couponId: string) {
   const coupon = COUPONS.find((c) => c.id === couponId)
   if (!coupon) throw new Error('Купон не найден')
 
@@ -61,7 +63,7 @@ export async function createPayment(couponId) {
  * Вызывается со страницы банка. Статус меняется не сразу, а через 3 секунды:
  * имитация вебхука, который приходит позже
  */
-export function confirmByBank(orderId, result) {
+export function confirmByBank(orderId: string, result: Webhook['result']) {
   const order = readOrders()[orderId]
   if (!order || order.status !== 'pending') return
 
@@ -74,14 +76,14 @@ export function confirmByBank(orderId, result) {
 }
 
 /** Возвращает текущий заказ (status: pending | success | failed) или null. */
-export async function getOrderStatus(orderId) {
+export async function getOrderStatus(orderId: string) {
   await delay(STATUS_DELAY)
   const order = readOrders()[orderId]
   if (!order) return null
   return applyWebhookIfDue(order)
 }
 
-function applyWebhookIfDue(order) {
+function applyWebhookIfDue(order: Order) {
   if (order.status !== 'pending' || !order.webhook) return order
   if (Date.now() < order.webhook.at) return order
 
