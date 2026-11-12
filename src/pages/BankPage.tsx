@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { confirmByBank, getOrderStatus } from '../api/paymentApi'
+import type { Order } from '../types'
 
 export default function BankPage() {
   const [params] = useSearchParams()
   const orderId = params.get('orderId')
-  const navigate = useNavigate()
-  const [order, setOrder] = useState(undefined) // undefined = загрузка, null = не найден
-  const [busy, setBusy] = useState(false)
 
+  if (!orderId) {
+    return <div className="bank"><p>Заказ не найден</p></div>
+  }
+
+  return <BankPayment orderId={orderId} />
+
+}
+function BankPayment({ orderId }: { orderId: string }) {
+  const navigate = useNavigate()
+  const [order, setOrder] = useState<Order | null | undefined>() // undefined = загрузка, null = не найден
+  const [busy, setBusy] = useState(false)
   useEffect(() => {
     let cancelled = false
     getOrderStatus(orderId).then((o) => {
